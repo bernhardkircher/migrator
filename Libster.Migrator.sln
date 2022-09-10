@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Libster.Migrator", "Libster.Migrator\Libster.Migrator.csproj", "{53C0E587-8BC0-4112-B986-86A00AA0F748}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Libster.Migrator.Tests", "Libster.Migrator.Tests\Libster.Migrator.Tests.csproj", "{16722F4B-AB67-46F8-9A7E-3341A0CB5E88}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Libster-Migrator.Example", "Libster-Migrator.Example\Libster-Migrator.Example.csproj", "{4C06C043-1633-4ACE-9C83-10C027CC81FB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{53C0E587-8BC0-4112-B986-86A00AA0F748}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{53C0E587-8BC0-4112-B986-86A00AA0F748}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{53C0E587-8BC0-4112-B986-86A00AA0F748}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{53C0E587-8BC0-4112-B986-86A00AA0F748}.Release|Any CPU.Build.0 = Release|Any CPU
+		{16722F4B-AB67-46F8-9A7E-3341A0CB5E88}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{16722F4B-AB67-46F8-9A7E-3341A0CB5E88}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{16722F4B-AB67-46F8-9A7E-3341A0CB5E88}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{16722F4B-AB67-46F8-9A7E-3341A0CB5E88}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4C06C043-1633-4ACE-9C83-10C027CC81FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4C06C043-1633-4ACE-9C83-10C027CC81FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4C06C043-1633-4ACE-9C83-10C027CC81FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4C06C043-1633-4ACE-9C83-10C027CC81FB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
