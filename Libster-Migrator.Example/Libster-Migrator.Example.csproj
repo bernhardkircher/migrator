@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net6.0</TargetFramework>
+        <RootNamespace>Libster_Migrator.Example</RootNamespace>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="System.Data.SqlClient" Version="4.8.3" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Libster.Migrator\Libster.Migrator.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="migrations\20220909001_down_remove foo feature.sql" />
+      <Content Include="migrations\20220909001_down_remove foo feature.sql">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <None Remove="migrations\20220909001_up_create foo feature.sql" />
+      <Content Include="migrations\20220909001_up_create foo feature.sql">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <None Remove="migrations\20220909002_up_foo feature improvement add new column.sql" />
+      <Content Include="migrations\20220909002_up_foo feature improvement add new column.sql">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+
+</Project>
