@@ -17,7 +17,7 @@ namespace Libster.Migrator
         private readonly IDbConnection _connection;
         private readonly ILogger _logger;
 
-        public Migrator(string identifier, IScriptSource scriptSource, IMigrationMetadataStore metadataStore, IDbConnection connection, ILogger logger)
+        public Migrator(ILogger logger, string identifier, IScriptSource scriptSource, IMigrationMetadataStore metadataStore, IDbConnection connection)
         {
             _identifier = identifier;
             _scriptSource = scriptSource;

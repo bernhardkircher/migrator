@@ -1,14 +1,19 @@
 ﻿using System;
 using System.Data;
+using System.IO;
+using Libster.Migrator.ScriptSources;
+using Microsoft.Extensions.Logging;
 
 namespace Libster.Migrator.MigrationMetadataStores;
 
 public class MsSqlMigrationMetadataStore : IMigrationMetadataStore
 {
+    private readonly ILogger _logger;
     private readonly IDbConnection _connection;
 
-    public MsSqlMigrationMetadataStore(IDbConnection connection)
+    public MsSqlMigrationMetadataStore(ILogger logger, IDbConnection connection)
     {
+        _logger = logger;
         _connection = connection;
     }
 
@@ -16,7 +21,11 @@ public class MsSqlMigrationMetadataStore : IMigrationMetadataStore
     {
         using (var cmd = _connection.CreateCommand())
         {
-            cmd.CommandText = "SELECT MAX(Version) FROM dbo.__Libster_Migrations__ WHERE SourceId = @SourceId";
+            // if we are installing the scahme for the metadatastore, the tables do not exist yet, but will be installed with the first script
+            cmd.CommandText = "IF OBJECT_ID('dbo.__Libster_Migrations__') IS NULL BEGIN SELECT CAST(NULL AS BIGINT) END " +
+                              "ELSE BEGIN" +
+                              " SELECT MAX(Version) FROM dbo.__Libster_Migrations__ WHERE SourceId = @SourceId" +
+                              " END";
             SqlHelper.AddParameter(cmd, "@SourceId", identifier);
                 
             var currentVersionValue = cmd.ExecuteScalar();
@@ -28,34 +37,31 @@ public class MsSqlMigrationMetadataStore : IMigrationMetadataStore
         }
     }
 
+    private bool _isInstallingMetadataSchema = false;
+
     public void Initialize()
     {
-        // TODO it would be cool if this were migrations as well.
-        // TODO this is very bad design: all methods take the IDbCommand, so we have transactional guarantees, but in here we work on the connection.
-        // either make the interface completlely isolated form underlying infrastructure (e.g. metadata could be stored in files or whatever) or make this consoistent.
-        using (var tx = _connection.BeginTransaction())
+        // if we are currnely in the process of installing the medata schema (using the migrator internally)
+        // make sure to not install the metadata schema again and again in an endless loop.
+        if (_isInstallingMetadataSchema)
         {
-            using(var cmd = _connection.CreateCommand())
-            {
-                cmd.Transaction = tx;
+            return;
+        }
+        
+        // TODO this is very bad design: all methods take the IDbCommand, so we have transactional guarantees, but in here we work on the connection.
+        // either make the interface completlely isolated form underlying infrastructure (e.g. metadata could be stored in files or whatever) or make this consistent.
+        _isInstallingMetadataSchema = true;
+        try {
+            Migrator metadataMigrator = new Migrator(_logger,nameof(MsSqlMigrationMetadataStore),
+                new FolderScriptSource(_logger, Path.Combine("MigrationMetadataStores", "MsSqlMigrationMetadataStoreMigrations")),
+                this,
+                _connection);
 
-                cmd.CommandText = @"
-                    IF OBJECT_ID('dbo.__Libster_Migrations__') IS NULL BEGIN
-                        CREATE TABLE dbo.__Libster_Migrations__ (
-                            SourceId NVARCHAR(256) NOT NULL,
-                            Version BIGINT NOT NULL,
-                            DateAppliedUtc DATETIME2 NOT NULL DEFAULT(GETUTCDATE()),
-                            Name NVARCHAR(256) NULL,
-                            ScriptContent NVARCHAR(MAX) NOT NULL,
-                            Description NVARCHAR(256) NULL,
-                            CONSTRAINT PK_Libster_Migrations PRIMARY KEY CLUSTERED (SourceId, Version)
-                        )
-                    END
-                    ";
-                cmd.ExecuteNonQuery();
-            }
-                
-            tx.Commit();
+            metadataMigrator.Migrate();
+        } 
+        finally
+        {
+            _isInstallingMetadataSchema = false;
         }
     }
 

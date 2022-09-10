@@ -10,4 +10,13 @@
       <PackageReference Include="System.Data.SqlClient" Version="4.8.3" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="MigrationMetadataStores\MsSqlMigrationMetadataStoreMigrations\1_up_ms sql install metadata schema.sql">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="MigrationMetadataStores\MsSqlMigrationMetadataStoreMigrations\1_down_ms sql uninstall etadata schema.sql">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 </Project>

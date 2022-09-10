@@ -28,7 +28,7 @@ public class FolderScriptSource : IScriptSource
                 return null;
             }
 
-            script.ScriptContent = File.ReadAllText(Path.Combine(_pathToFolderWithSqlScripts, x));
+            script.ScriptContent = File.ReadAllText(x);
             script.ScriptName = x;
             return script;
         }).Where(x => x != null);
