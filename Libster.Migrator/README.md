@@ -4,6 +4,29 @@
 Libster.Migrator is a library that helps with database migrations.
 This is not fully implemented and mostly for personal entertainment (read: more complex than needed, but I justify it by thinking about a certain problem and learning)
 
+Example
+=======
+```
+var connection = new SqlConnection("Server=.\\SQLExpress;Database=Libster_Migrator_Tests;Trusted_Connection=True;");
+var logger = new CustomConsoleLogger();
+
+// you can use relative or absolute paths. when suing relative, make sure that the folders are ther (e.g. use copy to output dir in the solution/project) 
+var scriptSource = new FolderScriptSource(logger, "migrations");
+var metaDataStore = new MsSqlMigrationMetadataStore(logger, connection);
+
+// the identifier is used if you have multiple scriptsources to identify the source of the scripts.
+string applicationIdentifier = "example";
+var migrationSource = new Migrator(logger, applicationIdentifier, scriptSource, metaDataStore, connection);
+
+// migrate to latest version:
+await migrationSource.Migrate();
+
+Console.WriteLine("Installed schema... uninstalling now...");
+// use the "down" scripts to revert back to version 0.
+await migrationSource.Migrate(0);
+```
+
+
 Key concepts
 ===========
 SqlScript: The definition of a script itself with additional metadata (version, ...). The main idea is to have a version (=long) which developers can just manually increment (e.g. 1, 2, 3, ...) or use a dateformat (e.g. yyyyMMddmmss). 
