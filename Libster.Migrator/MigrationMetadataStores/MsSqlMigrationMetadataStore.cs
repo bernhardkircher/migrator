@@ -53,7 +53,7 @@ public class MsSqlMigrationMetadataStore : IMigrationMetadataStore
         _isInstallingMetadataSchema = true;
         try {
             Migrator metadataMigrator = new Migrator(_logger,nameof(MsSqlMigrationMetadataStore),
-                new FolderScriptSource(_logger, Path.Combine("MigrationMetadataStores", "MsSqlMigrationMetadataStoreMigrations")),
+                new EmbeddedResourceScriptSource(_logger, "Libster.Migrator.MigrationMetadataStores.MsSqlMigrationMetadataStoreMigrations", this.GetType().Assembly),
                 this,
                 _connection);
 

@@ -51,4 +51,6 @@ when using the sql scripts, make sure their build type is set correctly, so that
 
 TODO
 ====
+Return more info about what has been migrated (e.g. new version etc)
+
 currently uses only sync. interfaces, no support for async.
