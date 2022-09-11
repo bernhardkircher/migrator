@@ -21,7 +21,7 @@ public class MsSqlMigrationMetadataStore : IMigrationMetadataStore
     {
         using (var cmd = _connection.CreateCommand())
         {
-            // if we are installing the scahme for the metadatastore, the tables do not exist yet, but will be installed with the first script
+            // if we are installing the schema for the metadatastore, the tables do not exist yet, but will be installed with the first script
             cmd.CommandText = "IF OBJECT_ID('dbo.__Libster_Migrations__') IS NULL BEGIN SELECT CAST(NULL AS BIGINT) END " +
                               "ELSE BEGIN" +
                               " SELECT MAX(Version) FROM dbo.__Libster_Migrations__ WHERE SourceId = @SourceId" +
@@ -66,22 +66,32 @@ public class MsSqlMigrationMetadataStore : IMigrationMetadataStore
     }
 
 
-    public void PrepareRemoveVersionsGreaterThanCommand(IDbCommand cmd, string identifier, long? targetVersion)
+    public void StoreScriptVersionSuccessfullyDowngraded(IDbTransaction tx, string identifier, long? targetVersion)
     {
-        cmd.CommandText =
-            "DELETE FROM dbo.__Libster_Migrations__ WHERE SourceId = @SourceId AND Version > @Version";
-        SqlHelper.AddParameter(cmd, "@SourceId", identifier);
-        SqlHelper.AddParameter(cmd, "@Version", targetVersion.Value);
+        using (var cmd = _connection.CreateCommand())
+        {
+            cmd.Transaction = tx;
+            cmd.CommandText =
+                "DELETE FROM dbo.__Libster_Migrations__ WHERE SourceId = @SourceId AND Version > @Version";
+            SqlHelper.AddParameter(cmd, "@SourceId", identifier);
+            SqlHelper.AddParameter(cmd, "@Version", targetVersion.Value);
+            cmd.ExecuteNonQuery();
+        }
     }
 
-    public void PrepareScriptVersionInstalledCommand(IDbCommand cmd, string identifier, SqlScript script)
+    public void StoreScriptVersionSuccessfullyMigrated(IDbTransaction tx, string identifier, SqlScript script)
     {
-        cmd.CommandText =
-            "INSERT INTO dbo.__Libster_Migrations__(SourceId, Version, Description, Name, ScriptContent) VALUES (@SourceId, @Version, @Description, @Name, @ScriptContent)";
-        SqlHelper.AddParameter(cmd, "@SourceId", identifier);
-        SqlHelper.AddParameter(cmd, "@Version", script.Version);
-        SqlHelper.AddParameter(cmd, "@Description", script.Description);
-        SqlHelper.AddParameter(cmd, "@Name", script.ScriptName);
-        SqlHelper.AddParameter(cmd, "@ScriptContent", script.ScriptContent);
+        using (var cmd = _connection.CreateCommand())
+        {
+            cmd.Transaction = tx;
+            cmd.CommandText =
+                "INSERT INTO dbo.__Libster_Migrations__(SourceId, Version, Description, Name, ScriptContent) VALUES (@SourceId, @Version, @Description, @Name, @ScriptContent)";
+            SqlHelper.AddParameter(cmd, "@SourceId", identifier);
+            SqlHelper.AddParameter(cmd, "@Version", script.Version);
+            SqlHelper.AddParameter(cmd, "@Description", script.Description);
+            SqlHelper.AddParameter(cmd, "@Name", script.ScriptName);
+            SqlHelper.AddParameter(cmd, "@ScriptContent", script.ScriptContent);
+            cmd.ExecuteNonQuery();
+        }
     }
 }

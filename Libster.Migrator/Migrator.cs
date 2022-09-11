@@ -8,6 +8,10 @@ using Microsoft.Extensions.Logging;
 
 namespace Libster.Migrator
 {
+    
+    /// <summary>
+    /// Executes database migrations.
+    /// </summary>
     public class Migrator
     {
         private readonly string _identifier;
@@ -92,15 +96,12 @@ namespace Libster.Migrator
                             if (needsDownGrade)
                             {
                                 // remove also all version larger than current version - there might be no "down" script for some verions
-                                _metadataStore.PrepareRemoveVersionsGreaterThanCommand(cmd, _identifier, script.Version);
-                                cmd.ExecuteNonQuery();
+                                _metadataStore.StoreScriptVersionSuccessfullyDowngraded(tx, _identifier, script.Version);
                             }
                             else
                             {
-                                _metadataStore.PrepareScriptVersionInstalledCommand(cmd, _identifier, script);
-                                cmd.ExecuteNonQuery();
+                                _metadataStore.StoreScriptVersionSuccessfullyMigrated(tx, _identifier, script);
                             }
-
                         }
                         catch (Exception ex)
                         {
@@ -114,14 +115,8 @@ namespace Libster.Migrator
                 // remove all installed scripts that do not have a down script.
                 if (needsDownGrade)
                 {
-                    using (var cmd = _connection.CreateCommand())
-                    {
-                        cmd.Transaction = tx;
-
-                        // remove also all version larger than current version - there might be no "down" script for some verions
-                        _metadataStore.PrepareRemoveVersionsGreaterThanCommand(cmd, _identifier, targetVersion);
-                        cmd.ExecuteNonQuery();
-                    }
+                    // remove also all version larger than current version - there might be no "down" script for some verions
+                    _metadataStore.StoreScriptVersionSuccessfullyDowngraded(tx, _identifier, targetVersion);
                 }
 
                 tx.Commit();

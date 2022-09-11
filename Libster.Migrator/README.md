@@ -1,11 +1,31 @@
 ﻿About
 =====
 
-
 Libster.Migrator is a library that helps with database migrations.
+This is not fully implemented and mostly for personal entertainment (read: more complex than needed, but I justify it by thinking about a certain problem and learning)
 
+Key concepts
+===========
+SqlScript: The definition of a script itself with additional metadata (version, ...). The main idea is to have a version (=long) which developers can just manually increment (e.g. 1, 2, 3, ...) or use a dateformat (e.g. yyyyMMddmmss). 
+It is important that version is ordered - newer scripts need to have a higher version than an older one.
+
+There are 2 types of scripts: up scripts (install newer versions, e.g. add new columsn, tables,) and down scripts (that are used to undo an "up" script.) Downscripts are optional but should always remove what the matching "up" script did.
+
+
+IScriptSource: An interface, who is responsible to provide all scripts that are available and probably might need to be executed.
+The idea is to separate the location of scripts from their execution (they can be on a filesystem, embedded ressources, a database or whatever).
+
+IMigrationMetadataStore: AN interface that is responsible to store version information, so that the system knows which scripts (version) have been applied.
+
+Migrator: the migrator itself, that uses the IScriptSource and IMigrationMetadataStore to actually apply the scripts.
+
+Currently there is only a MS SQL implementation available.
+For Scripts, the current naming convention that needs to be followed id:
+"{versionnumber}_{up|down}_{descriptiontext?}.sql"
+
+
+when using the sql scripts, make sure their build type is set correctly, so that they get picked/location is as expected.
 
 TODO
 ====
-
 currently uses only sync. interfaces, no support for async.
