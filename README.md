@@ -7,6 +7,7 @@ This is not fully implemented and mostly for personal entertainment (read: more 
 
 [![.NET](https://github.com/bernhardkircher/migrator/actions/workflows/dotnet.yml/badge.svg)](https://github.com/bernhardkircher/migrator/actions/workflows/dotnet.yml)
 
+[![Code Quality](https://github.com/bernhardkircher/migrator/actions/workflows/codequality.yml/badge.svg)](https://github.com/bernhardkircher/migrator/actions/workflows/codequality.yml)
 
 Example
 =======
