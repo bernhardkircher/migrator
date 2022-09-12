@@ -70,34 +70,7 @@ namespace Libster.Migrator
             {
                 foreach (var script in scriptsToExecute)
                 {
-                    using (var cmd = _connection.CreateCommand())
-                    {
-                        try
-                        {
-                            cmd.Transaction = tx;
-
-                            var scriptFileName = script.ScriptName;
-                            _logger.LogInformation($"Executing script {scriptFileName}");
-
-                            cmd.CommandText = script.ScriptContent;
-                            cmd.ExecuteNonQuery();
-
-                            if (needsDownGrade)
-                            {
-                                // remove also all version larger than current version - there might be no "down" script for some verions
-                                _metadataStore.StoreScriptVersionSuccessfullyDowngraded(tx, _identifier, script.Version);
-                            }
-                            else
-                            {
-                                _metadataStore.StoreScriptVersionSuccessfullyMigrated(tx, _identifier, script);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.LogWarning(ex, $"Error while executing script");
-                            throw;
-                        }
-                    }
+                    ApplyMigrationScript(needsDownGrade, tx, script);
                 }
 
                 // final cleanup in case of downgrade - if we downgrade to a version that is smaller than min installed script version (= e.g. zo "0")
@@ -109,6 +82,38 @@ namespace Libster.Migrator
                 }
 
                 tx.Commit();
+            }
+        }
+
+        private void ApplyMigrationScript(bool needsDownGrade, IDbTransaction tx, SqlScript script)
+        {
+            using (var cmd = _connection.CreateCommand())
+            {
+                try
+                {
+                    cmd.Transaction = tx;
+
+                    var scriptFileName = script.ScriptName;
+                    _logger.LogInformation($"Executing script {scriptFileName}");
+
+                    cmd.CommandText = script.ScriptContent;
+                    cmd.ExecuteNonQuery();
+
+                    if (needsDownGrade)
+                    {
+                        // remove also all version larger than current version - there might be no "down" script for some verions
+                        _metadataStore.StoreScriptVersionSuccessfullyDowngraded(tx, _identifier, script.Version);
+                    }
+                    else
+                    {
+                        _metadataStore.StoreScriptVersionSuccessfullyMigrated(tx, _identifier, script);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, $"Error while executing script");
+                    throw;
+                }
             }
         }
 
