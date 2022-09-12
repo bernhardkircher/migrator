@@ -1,0 +1,5 @@
+﻿exclude_patterns:
+  - "Libster.Migrator.Example/"
+  # altough tests should also be scanned - for now we do not use the same rules as for the library itself
+  # you obviously would not do this - test also need to maintained etc.
+  - "Libster.Migrator.Tests/"
