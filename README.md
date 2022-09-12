@@ -5,7 +5,7 @@ Libster.Migrator is a library that helps with database migrations.
 This is not fully implemented and mostly for personal entertainment (read: more complex than needed, but I justify it by thinking about a certain problem and learning)
 
 
-![Build status](https://github.com/bernhardkircher/migrator/actions/workflows/dotnet.yml/badge.svg)
+[![.NET](https://github.com/bernhardkircher/migrator/actions/workflows/dotnet.yml/badge.svg)](https://github.com/bernhardkircher/migrator/actions/workflows/dotnet.yml)
 
 
 Example
