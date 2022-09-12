@@ -34,31 +34,40 @@ public class EmbeddedResourceScriptSource : IScriptSource
         
         var validFilesOrderedByVersion = allResourcesInDefinedNamespace.Select(x =>
         {
-
-            var nameWithoutAssemblyPath = x.Replace(_embeddedResourceFolderPrefix, "");
-            if (nameWithoutAssemblyPath.StartsWith("."))
+            if (!TryCreateSqlScript(x, out var script))
             {
-                nameWithoutAssemblyPath = nameWithoutAssemblyPath.Remove(0, 1);
-            }
-            
-            if (!SqlScript.TryParseFromFileName(nameWithoutAssemblyPath, out SqlScript script))
-            {
-                _logger.LogDebug($"Could not parse scriptfile {x}");
                 return null;
             }
-            
-            using (var stream = _assemblyWithEmbeddedResources.GetManifestResourceStream(x))
-            {
-                using (var reader = new StreamReader(stream))
-                {
-                    script.ScriptContent = reader.ReadToEnd();
-                }
-            }
 
-            script.ScriptName = x;
             return script;
         }).Where(x => x != null);
             
         return validFilesOrderedByVersion;
+    }
+
+    private bool TryCreateSqlScript(string x, out SqlScript script)
+    {
+        var nameWithoutAssemblyPath = x.Replace(_embeddedResourceFolderPrefix, "");
+        if (nameWithoutAssemblyPath.StartsWith("."))
+        {
+            nameWithoutAssemblyPath = nameWithoutAssemblyPath.Remove(0, 1);
+        }
+
+        if (!SqlScript.TryParseFromFileName(nameWithoutAssemblyPath, out script))
+        {
+            _logger.LogDebug($"Could not parse scriptfile {x}");
+            return false;
+        }
+
+        using (var stream = _assemblyWithEmbeddedResources.GetManifestResourceStream(x))
+        {
+            using (var reader = new StreamReader(stream))
+            {
+                script.ScriptContent = reader.ReadToEnd();
+            }
+        }
+
+        script.ScriptName = x;
+        return true;
     }
 }
