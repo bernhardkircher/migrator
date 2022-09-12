@@ -30,20 +30,3 @@ jobs:
         path: TestResults
       # Use always() to always run this step to publish test results when there are test failures
       if: ${{ always() }}
-      
-  code-quality:
-    runs-on: ubuntu-latest
-    name: Code Climate Standalone
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Run Code Climate
-        uses: erzz/codeclimate-standalone@v0.0.4
-        with:
-          html_report: true
-      - name: Upload Report
-        uses: actions/upload-artifact@v3
-        if: always()
-        with:
-          name: Code Climate Report
-          path: codeclimate-report.html
