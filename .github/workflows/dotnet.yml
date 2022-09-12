@@ -38,11 +38,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Run Code Climate
-        uses: erzz/codeclimate-standalone@v0
+        uses: erzz/codeclimate-standalone@v0.0.4
         with:
           html_report: true
       - name: Upload Report
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         if: always()
         with:
           name: Code Climate Report
