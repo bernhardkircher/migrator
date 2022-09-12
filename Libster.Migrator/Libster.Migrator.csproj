@@ -3,11 +3,26 @@
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
         <LangVersion>10</LangVersion>
+        
+        <!-- compiler settings, to imrove quality. -->
+        <EnableNETAnalyzers>true</EnableNETAnalyzers>
+        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+        <!--<AnalysisLevelSecurity>preview</AnalysisLevelSecurity>-->
+        <!--<AnalysisLevelDocumentation>preview</AnalysisLevelDocumentation>-->
+        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <CodeAnalysisTreatWarningsAsErrors>true</CodeAnalysisTreatWarningsAsErrors>
     </PropertyGroup>
 
     <ItemGroup>
       <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
       <PackageReference Include="System.Data.SqlClient" Version="4.8.3" />
+
+        <!-- use sonarlint for additional checks. Although this is not sonarquube, it gives immediate feedback to developers. -->
+        <PackageReference Include="SonarAnalyzer.CSharp" Version="8.41.0.50478">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
     </ItemGroup>
 
     <ItemGroup>

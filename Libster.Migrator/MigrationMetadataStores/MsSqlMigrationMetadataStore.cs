@@ -48,8 +48,6 @@ public class MsSqlMigrationMetadataStore : IMigrationMetadataStore
             return;
         }
         
-        // TODO this is very bad design: all methods take the IDbCommand, so we have transactional guarantees, but in here we work on the connection.
-        // either make the interface completlely isolated form underlying infrastructure (e.g. metadata could be stored in files or whatever) or make this consistent.
         _isInstallingMetadataSchema = true;
         try {
             Migrator metadataMigrator = new Migrator(_logger,nameof(MsSqlMigrationMetadataStore),
@@ -66,11 +64,11 @@ public class MsSqlMigrationMetadataStore : IMigrationMetadataStore
     }
 
 
-    public void StoreScriptVersionSuccessfullyDowngraded(IDbTransaction tx, string identifier, long? targetVersion)
+    public void StoreScriptVersionSuccessfullyDowngraded(IDbTransaction transaction, string identifier, long? targetVersion)
     {
         using (var cmd = _connection.CreateCommand())
         {
-            cmd.Transaction = tx;
+            cmd.Transaction = transaction;
             cmd.CommandText =
                 "DELETE FROM dbo.__Libster_Migrations__ WHERE SourceId = @SourceId AND Version > @Version";
             SqlHelper.AddParameter(cmd, "@SourceId", identifier);
@@ -79,11 +77,11 @@ public class MsSqlMigrationMetadataStore : IMigrationMetadataStore
         }
     }
 
-    public void StoreScriptVersionSuccessfullyMigrated(IDbTransaction tx, string identifier, SqlScript script)
+    public void StoreScriptVersionSuccessfullyMigrated(IDbTransaction transaction, string identifier, SqlScript script)
     {
         using (var cmd = _connection.CreateCommand())
         {
-            cmd.Transaction = tx;
+            cmd.Transaction = transaction;
             cmd.CommandText =
                 "INSERT INTO dbo.__Libster_Migrations__(SourceId, Version, Description, Name, ScriptContent) VALUES (@SourceId, @Version, @Description, @Name, @ScriptContent)";
             SqlHelper.AddParameter(cmd, "@SourceId", identifier);
