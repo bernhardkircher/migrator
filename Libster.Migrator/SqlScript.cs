@@ -32,13 +32,27 @@ public class SqlScript
         }
 
         // first part must be version
-        if (!long.TryParse(parts[0], out long version))
+        if (!long.TryParse(parts[0], out long version) || 
+            // second part must be migrationtype
+            !TryValidateMigrationType(parts[1], out var migrationType))
         {
             return false;
         }
-                
-        // second part must be migrationtype
-        if (!Enum.TryParse(parts[1], ignoreCase: true, out MigrationType migrationType))
+        
+        sqlScript = new SqlScript()
+        {
+            Version = version,
+            MigrationType = migrationType,
+            // all other parts are interpreted as description
+            Description = parts.Length <= 2 ? null :  string.Join('_', parts.Skip(2))
+        };
+
+        return true;
+    }
+
+    private static bool TryValidateMigrationType(string migrationTypeRaw, out MigrationType migrationType)
+    {
+        if (!Enum.TryParse(migrationTypeRaw, ignoreCase: true, out migrationType))
         {
             return false;
         }
@@ -48,19 +62,6 @@ public class SqlScript
             return false;
         }
 
-        sqlScript = new SqlScript()
-        {
-            Version = version,
-            MigrationType = migrationType
-        };
-
-        // all other parts are interpreted as description
-        if (parts.Length > 2)
-        {
-
-            sqlScript.Description = string.Join('_', parts.Skip(2));
-        }
-                
         return true;
     }
 }
