@@ -48,35 +48,24 @@ namespace Libster.Migrator
             // 1. get current installed version
             var currentInstalledVersion = _metadataStore.GetCurrentInstalledVersion(_identifier);
             _logger.LogInformation($"Current installed version for {_identifier} is {currentInstalledVersion}");
-            var validFilesOrderedByVersion = _scriptSource.GetAllScripts()
-                .OrderBy(x => x.Version)
-                .ToArray();
-
-            _logger.LogInformation($"Found {validFilesOrderedByVersion.Length} script files.");
-
-
+            
+            
             var needsDownGrade = currentInstalledVersion.HasValue && targetVersion.HasValue &&
                                  currentInstalledVersion.Value > targetVersion.Value;
-
-            // 2. get all versions that are higher than current installed version
-            var scriptsToExecute = validFilesOrderedByVersion
-                .Where(x => x.MigrationType == (needsDownGrade ? MigrationType.Down : MigrationType.Up)).ToArray();
-            if (needsDownGrade)
-            {
-                // when downgrading, we are downgrading from version 3, to 2, then to 1 (therefore order by desc).
-                scriptsToExecute = scriptsToExecute.OrderByDescending(x => x.Version)
-                    .Where(x => x.Version <= currentInstalledVersion.Value && x.Version > targetVersion).ToArray();
-            }
-            else
-            {
-                scriptsToExecute = scriptsToExecute.OrderBy(x => x.Version).Where(x =>
-                    !currentInstalledVersion.HasValue || x.Version > currentInstalledVersion.Value).ToArray();
-            }
+            
+            var scriptsToExecute = GetScriptsToExecute(targetVersion, needsDownGrade, currentInstalledVersion);
 
             _logger.LogInformation(
                 $"Is downgrade: {needsDownGrade}; targetVersion: {targetVersion}; Number of scripts to execute: {scriptsToExecute.Length}");
 
             // 3. run script and update metadata (installed version).
+            ApplyMigrationScripts(targetVersion, scriptsToExecute, needsDownGrade);
+
+            return Task.CompletedTask;
+        }
+
+        private void ApplyMigrationScripts(long? targetVersion, SqlScript[] scriptsToExecute, bool needsDownGrade)
+        {
             using (var tx = _connection.BeginTransaction())
             {
                 foreach (var script in scriptsToExecute)
@@ -121,8 +110,33 @@ namespace Libster.Migrator
 
                 tx.Commit();
             }
+        }
 
-            return Task.CompletedTask;
+        private SqlScript[] GetScriptsToExecute(long? targetVersion, bool needsDownGrade, long? currentInstalledVersion)
+        {
+            var validFilesOrderedByVersion = _scriptSource.GetAllScripts()
+                .OrderBy(x => x.Version)
+                .ToArray();
+
+            _logger.LogInformation($"Found {validFilesOrderedByVersion.Length} script files.");
+
+
+            // 2. get all versions that are higher than current installed version
+            var scriptsToExecute = validFilesOrderedByVersion
+                .Where(x => x.MigrationType == (needsDownGrade ? MigrationType.Down : MigrationType.Up)).ToArray();
+            if (needsDownGrade)
+            {
+                // when downgrading, we are downgrading from version 3, to 2, then to 1 (therefore order by desc).
+                scriptsToExecute = scriptsToExecute.OrderByDescending(x => x.Version)
+                    .Where(x => x.Version <= currentInstalledVersion.Value && x.Version > targetVersion).ToArray();
+            }
+            else
+            {
+                scriptsToExecute = scriptsToExecute.OrderBy(x => x.Version).Where(x =>
+                    !currentInstalledVersion.HasValue || x.Version > currentInstalledVersion.Value).ToArray();
+            }
+
+            return scriptsToExecute;
         }
     }
 }
