@@ -4,7 +4,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Libster.Migrator", "Libster
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Libster.Migrator.Tests", "Libster.Migrator.Tests\Libster.Migrator.Tests.csproj", "{16722F4B-AB67-46F8-9A7E-3341A0CB5E88}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Libster-Migrator.Example", "Libster-Migrator.Example\Libster-Migrator.Example.csproj", "{4C06C043-1633-4ACE-9C83-10C027CC81FB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Libster.Migrator.Example", "Libster.Migrator.Example\Libster.Migrator.Example.csproj", "{4C06C043-1633-4ACE-9C83-10C027CC81FB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "doc", "doc", "{E91A0C74-C3FF-4643-A468-4A0A71CE8788}"
 	ProjectSection(SolutionItems) = preProject
